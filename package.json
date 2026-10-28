@@ -1,0 +1,27 @@
+{
+  "name": "bun-react-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/backend/main.ts",
+    "start": "NODE_ENV=production bun src/backend/main.ts",
+    "build": "bun run build.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/azure": "^4.0.112",
+    "@ai-sdk/react": "^4.0.159",
+    "ai": "^7.0.155",
+    "bun-plugin-tailwind": "^0.0.15",
+    "react": "^19",
+    "react-dom": "^19",
+    "tailwindcss": "^4.1.11",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.3",
+    "@types/bun": "latest",
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
+  }
+}

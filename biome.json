@@ -1,0 +1,20 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.6.3/schema.json",
+	"files": { "includes": ["src/**", "!**/APITester.tsx"] },
+	"assist": { "actions": { "source": { "organizeImports": "off" } } },
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 100
+	},
+	"css": { "parser": { "tailwindDirectives": true } },
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"quoteProperties": "asNeeded",
+			"trailingCommas": "es5",
+			"semicolons": "asNeeded"
+		}
+	}
+}
