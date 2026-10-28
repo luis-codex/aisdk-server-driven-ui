@@ -1,6 +1,7 @@
 import { useChat } from '@ai-sdk/react'
 import { isToolUIPart } from 'ai'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useAttachments } from './shared/hooks/use-attachments'
 import { ServerComponent, type IServerUI } from './ui/components/server-component'
 import './index.css'
 
@@ -38,6 +39,15 @@ const SUGGESTIONS: { text: string; icon: ReactNode }[] = [
 		icon: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
 	},
 	{
+		text: 'Quiero agendar una reunión',
+		icon: (
+			<>
+				<rect x="3" y="4" width="18" height="18" rx="2" />
+				<path d="M8 2v4M16 2v4M3 10h18" />
+			</>
+		),
+	},
+	{
 		text: 'Dime el clima en Quito',
 		icon: (
 			<>
@@ -67,7 +77,9 @@ function Icon({ children }: { children: ReactNode }) {
 
 export const App: React.FC = () => {
 	const [input, setInput] = useState('')
-	const { messages, sendMessage, status, error } = useChat()
+	const { messages, sendMessage, setMessages, stop, status, error } = useChat()
+	const attachments = useAttachments()
+	const fileInputRef = useRef<HTMLInputElement>(null)
 	const bottomRef = useRef<HTMLDivElement>(null)
 	const busy = status !== 'ready'
 
@@ -81,8 +93,38 @@ export const App: React.FC = () => {
 		setInput('')
 	}
 
+	const submit = async () => {
+		if ((!input.trim() && attachments.attachments.length === 0) || busy) return
+		const files = await attachments.toFileParts()
+		sendMessage({ text: input, files })
+		setInput('')
+		attachments.clear()
+	}
+
+	const newChat = () => {
+		stop()
+		setMessages([])
+		setInput('')
+		attachments.clear()
+	}
+
 	return (
 		<div className="w-[480px] max-w-[calc(100vw-2rem)] h-[min(92vh,780px)] flex flex-col rounded-[2rem] border border-white/10 bg-[#212121] shadow-2xl p-6 gap-4 text-left">
+			<div className="flex justify-end -mb-2">
+				<button
+					type="button"
+					className="size-10 rounded-xl grid place-items-center text-white/70 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+					onClick={newChat}
+					aria-label="Chat nuevo"
+					title="Chat nuevo"
+				>
+					<Icon>
+						<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+						<path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.8a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z" />
+					</Icon>
+				</button>
+			</div>
+
 			<div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
 				{messages.length === 0 ? (
 					<div className="mt-auto flex flex-col gap-5">
@@ -118,6 +160,15 @@ export const App: React.FC = () => {
 											{part.text}
 										</p>
 									)
+								if (part.type === 'file' && part.mediaType.startsWith('image/'))
+									return (
+										<img
+											key={i}
+											src={part.url}
+											alt={part.filename ?? 'Imagen adjunta'}
+											className="max-h-48 rounded-2xl object-cover"
+										/>
+									)
 								if (isToolUIPart(part)) {
 									if (part.state === 'output-error')
 										return (
@@ -149,22 +200,67 @@ export const App: React.FC = () => {
 				<div ref={bottomRef} />
 			</div>
 
+			{attachments.attachments.length > 0 && (
+				<div className="flex gap-2 px-2">
+					{attachments.attachments.map((a) => (
+						<div key={a.id} className="relative">
+							<img
+								src={a.previewUrl}
+								alt={a.file.name}
+								className="size-16 rounded-xl object-cover"
+							/>
+							<button
+								type="button"
+								className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-white text-black text-xs leading-none cursor-pointer"
+								onClick={() => attachments.remove(a.id)}
+								aria-label={`Quitar ${a.file.name}`}
+							>
+								×
+							</button>
+						</div>
+					))}
+				</div>
+			)}
+
 			<form
-				className="flex items-center gap-3 rounded-full bg-[#303030] pl-6 pr-2 py-2"
+				className="flex items-center gap-2 rounded-full bg-[#303030] pl-2 pr-2 py-2"
 				onSubmit={(e) => {
 					e.preventDefault()
-					send(input)
+					submit()
 				}}
 			>
 				<input
-					className="flex-1 bg-transparent outline-none text-lg placeholder:text-white/40"
+					ref={fileInputRef}
+					type="file"
+					accept="image/*"
+					multiple
+					hidden
+					onChange={(e) => {
+						attachments.add(e.currentTarget.files)
+						e.currentTarget.value = ''
+					}}
+				/>
+				<button
+					type="button"
+					className="size-11 shrink-0 rounded-full grid place-items-center text-white/70 hover:text-white disabled:opacity-40 cursor-pointer"
+					disabled={!attachments.canAdd}
+					onClick={() => fileInputRef.current?.click()}
+					aria-label="Adjuntar imagen"
+					title="Adjuntar imagen"
+				>
+					<Icon>
+						<path d="M12 5v14M5 12h14" />
+					</Icon>
+				</button>
+				<input
+					className="flex-1 min-w-0 bg-transparent outline-none text-lg placeholder:text-white/40"
 					value={input}
 					onChange={(e) => setInput(e.currentTarget.value)}
 					placeholder="Enviar mensaje a la IA"
 				/>
 				<button
-					className="size-11 rounded-full bg-white text-black grid place-items-center disabled:opacity-40 cursor-pointer"
-					disabled={busy || !input.trim()}
+					className="size-11 shrink-0 rounded-full bg-white text-black grid place-items-center disabled:opacity-40 cursor-pointer"
+					disabled={busy || (!input.trim() && attachments.attachments.length === 0)}
 					aria-label="Enviar"
 				>
 					<svg
