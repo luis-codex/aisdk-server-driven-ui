@@ -8,7 +8,7 @@ Chat con el [AI SDK](https://ai-sdk.dev) de Vercel y Azure OpenAI donde **el bac
 
 ## Cómo funciona
 
-1. El modelo llama a una tool (`getWeather`, `showInstallChart`, `showCart`).
+1. El modelo llama a una tool (`getWeather`, `showInstallChart`, `showCart`, `showEventWizard`).
 2. La tool renderiza el componente con `renderToString` y devuelve `{ module, props, html }`.
 3. El backend compila cada componente a un módulo ESM (`Bun.build`) y lo sirve en `/ui/:file`.
 4. El frontend pinta el `html` al instante, hace `import(module)` y llama a `hydrate`: React reutiliza el DOM y le conecta eventos y estado (por ejemplo, el botón °C/°F o el carrito).

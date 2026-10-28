@@ -5,6 +5,7 @@ import { RunAgent } from './api/chat/run-agent'
 import { UiController } from './api/ui/ui.controller'
 import { ChatAgentService } from './services/agents-service/chat-agent'
 import { GetWeatherTool } from './services/agents-service/chat-agent/tools/get-weather.tool'
+import { ShowEventWizardTool } from './services/agents-service/chat-agent/tools/show-event-wizard.tool'
 import { ShowCartTool } from './services/agents-service/chat-agent/tools/show-cart.tool'
 import { ShowInstallChartTool } from './services/agents-service/chat-agent/tools/show-install-chart.tool'
 import { AzureFoundryAiService } from './services/azure-foundry-ai-service'
@@ -24,7 +25,8 @@ const chatAgentService = new ChatAgentService(
 	secretsService,
 	new GetWeatherTool(weatherService, uiService),
 	new ShowInstallChartTool(uiService),
-	new ShowCartTool(uiService)
+	new ShowCartTool(uiService),
+	new ShowEventWizardTool(uiService)
 )
 const chatController = new ChatController(new RunAgent(chatAgentService))
 const uiController = new UiController(uiService)

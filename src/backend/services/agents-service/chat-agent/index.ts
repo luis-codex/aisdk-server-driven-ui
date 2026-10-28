@@ -4,6 +4,7 @@ import { SecretsService } from '@/backend/services/secrets-service'
 import type { IAgentService } from '../types'
 import { GetWeatherTool } from './tools/get-weather.tool'
 import { ShowCartTool } from './tools/show-cart.tool'
+import { ShowEventWizardTool } from './tools/show-event-wizard.tool'
 import { ShowInstallChartTool } from './tools/show-install-chart.tool'
 
 const INSTRUCTIONS = `
@@ -17,6 +18,12 @@ Catálogo de bebidas: Black Sugar Hoick Latte, Classic Milk Tea y Matcha Latte.
   el usuario elige ahí y su decisión llega como un mensaje ("Confirmo la compra: …" o
   "Agrégalo al carrito: …").
 - Cuando llegue ese mensaje, confírmalo en una frase y NO vuelvas a llamar showCart.
+
+Agenda de eventos:
+- Usa showEventWizard cuando el usuario quiera agendar, crear o programar un evento o reunión;
+  precarga lo que ya haya dicho (título, fecha, hora, lugar).
+- El formulario es interactivo: el usuario lo completa ahí y su decisión llega como un mensaje
+  ("Confirmo el evento: …"). Cuando llegue, confírmalo en una frase y NO vuelvas a llamar showEventWizard.
 Todo es una simulación.
 `
 
@@ -26,18 +33,20 @@ export class ChatAgentService implements IAgentService {
 		private readonly _secretsService: SecretsService,
 		private readonly _getWeatherTool: GetWeatherTool,
 		private readonly _showInstallChartTool: ShowInstallChartTool,
-		private readonly _showCartTool: ShowCartTool
+		private readonly _showCartTool: ShowCartTool,
+		private readonly _showEventWizardTool: ShowEventWizardTool
 	) {}
 
 	public getAgent(): ToolLoopAgent<never, ToolSet> {
 		const modelId = this._secretsService.getRequired('AZURE_OPENAI_GENERATIVE_DEPLOYMENT')
 		return new ToolLoopAgent<never, ToolSet>({
 			model: this._azureFoundryAiService.languageModel(modelId),
-			instructions: INSTRUCTIONS,
+			instructions: `${INSTRUCTIONS}\nFecha de hoy: ${new Date().toISOString().slice(0, 10)}.`,
 			tools: {
 				getWeather: this._getWeatherTool.tool(),
 				showInstallChart: this._showInstallChartTool.tool(),
 				showCart: this._showCartTool.tool(),
+				showEventWizard: this._showEventWizardTool.tool(),
 			},
 		})
 	}
