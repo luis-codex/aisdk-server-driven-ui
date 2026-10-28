@@ -40,7 +40,7 @@ export class ChatAgentService implements IAgentService {
 	public getAgent(): ToolLoopAgent<never, ToolSet> {
 		const modelId = this._secretsService.getRequired('AZURE_OPENAI_GENERATIVE_DEPLOYMENT')
 		return new ToolLoopAgent<never, ToolSet>({
-			model: this._azureFoundryAiService.languageModel(modelId),
+			model: this._azureFoundryAiService.responsesModel(modelId),
 			instructions: `${INSTRUCTIONS}\nFecha de hoy: ${new Date().toISOString().slice(0, 10)}.`,
 			tools: {
 				getWeather: this._getWeatherTool.tool(),

@@ -17,4 +17,9 @@ export class AzureFoundryAiService {
 	public languageModel(modelId: string): LanguageModel {
 		return this._provider.chat(modelId)
 	}
+
+	// Modelos de razonamiento (gpt-6-luna) solo aceptan tools vía /v1/responses.
+	public responsesModel(modelId: string): LanguageModel {
+		return this._provider.responses(modelId)
+	}
 }
