@@ -14,13 +14,17 @@ export class ShowCartTool {
 
         Input: "productIds" (bebidas del catálogo a ofrecer).
 
-        Úsala cuando el usuario quiera comprar bebidas. Todo es una simulación.
+        Úsala solo cuando el usuario pida comprar o elegir bebidas, no para preguntas informativas. Todo es una simulación.
       `,
 			inputSchema: z.object({
 				productIds: z.array(z.enum(PRODUCT_IDS)).min(1).describe('Bebidas del catálogo a ofrecer'),
 			}),
 			execute: async ({ productIds }) => this._uiService.render('CartCard', { productIds }),
-			toModelOutput: ({ output }) => ({ type: 'text', value: JSON.stringify(output.props) }),
+			// La tarjeta es interactiva: el modelo debe saber que está abierta y esperando la elección.
+			toModelOutput: ({ output }) => ({
+				type: 'text',
+				value: `Tarjeta interactiva mostrada al usuario con ${JSON.stringify(output.props.productIds)}. Espera su elección: llegará como un mensaje del usuario.`,
+			}),
 		})
 	}
 }

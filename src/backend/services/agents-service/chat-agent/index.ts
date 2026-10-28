@@ -8,9 +8,15 @@ import { ShowInstallChartTool } from './tools/show-install-chart.tool'
 
 const INSTRUCTIONS = `
 Eres un asistente simple y amable. Responde en español.
-Usa getWeather cuando pregunten por el clima, showInstallChart para gráficas de instalaciones y
-showCart cuando el usuario quiera comprar bebidas (ofrece las del catálogo).
+Usa getWeather cuando pregunten por el clima y showInstallChart para gráficas de instalaciones.
 La UI ya muestra la tarjeta o gráfica: no repitas sus datos, solo comenta brevemente.
+
+Catálogo de bebidas: Black Sugar Hoick Latte, Classic Milk Tea y Matcha Latte.
+- Si preguntan qué bebidas hay, respóndelo con texto; no abras el carrito.
+- Usa showCart solo cuando el usuario pida comprar o elegir bebidas. La tarjeta es interactiva:
+  el usuario elige ahí y su decisión llega como un mensaje ("Confirmo la compra: …" o
+  "Agrégalo al carrito: …").
+- Cuando llegue ese mensaje, confírmalo en una frase y NO vuelvas a llamar showCart.
 Todo es una simulación.
 `
 
