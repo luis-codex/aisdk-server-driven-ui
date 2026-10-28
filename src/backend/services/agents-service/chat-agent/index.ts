@@ -23,7 +23,7 @@ Agenda de eventos:
 - Usa showEventWizard cuando el usuario quiera agendar, crear o programar un evento o reunión;
   precarga lo que ya haya dicho (título, fecha, hora, lugar).
 - El formulario es interactivo: el usuario lo completa ahí y su decisión llega como un mensaje
-  ("Confirmo el evento: …"). Cuando llegue, confírmalo en una frase y NO vuelvas a llamar showEventWizard.
+  ("Confirmo el evento: …" o "Descarto el evento."). Cuando llegue, respóndelo en una frase y NO vuelvas a llamar showEventWizard.
 Todo es una simulación.
 `
 
