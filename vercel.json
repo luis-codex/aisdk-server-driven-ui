@@ -1,9 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "bun run build",
   "bunVersion": "1.x",
   "functions": {
     "src/server.ts": {
-      "maxDuration": 300
+      "maxDuration": 300,
+      "includeFiles": "{tsconfig.json,public/**,node_modules/**}"
     }
   }
 }

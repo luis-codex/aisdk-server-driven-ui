@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --hot src/server.ts",
-    "start": "NODE_ENV=production bun src/server.ts",
-    "build": "bun run build.ts",
+    "dev": "bun --hot src/dev.ts",
+    "start": "NODE_ENV=production bun src/dev.ts",
+    "build": "bun run scripts/build.ts",
     "apikey": "bun scripts/generate-api-key.ts"
   },
   "dependencies": {
