@@ -1,4 +1,3 @@
-import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import type { ComponentProps, ComponentType } from 'react'
 import { renderToString } from 'react-dom/server'
@@ -7,8 +6,7 @@ import type { IServerUI } from './types'
 
 const MODULES_PATH = '/ui'
 const COMPONENTS_DIR = path.resolve(import.meta.dir, '../../components')
-// Dentro de node_modules para que los imports de "react" se resuelvan desde el proyecto.
-const ENTRIES_DIR = path.resolve(import.meta.dir, '../../../../node_modules/.cache/ui-entries')
+const ENTRY_NAMESPACE = 'ui-component-entry'
 
 /**
  * Renderiza los componentes en el servidor y los compila como módulos ESM para que el
@@ -32,9 +30,28 @@ export class UiService {
 
 	/** Compila cada componente con `splitting` para compartir React en un chunk común. */
 	public async build(): Promise<void> {
-		const entrypoints = await this._writeEntries()
 		const result = await Bun.build({
-			entrypoints,
+			entrypoints: [...Object.keys(COMPONENTS)],
+			plugins: [
+				{
+					name: 'virtual-ui-component-entries',
+					setup: (build) => {
+						build.onResolve({ filter: /.*/ }, (args) =>
+							args.kind === 'entry-point-build' || args.kind === 'entry-point-run'
+								? { path: args.path, namespace: ENTRY_NAMESPACE }
+								: undefined
+						)
+						build.onLoad({ filter: /.*/, namespace: ENTRY_NAMESPACE }, (args) => ({
+							contents:
+								`import { ${args.path} } from ${JSON.stringify(path.join(COMPONENTS_DIR, this._toKebabCase(args.path)))}\n` +
+								`import { hydrate } from ${JSON.stringify(path.join(COMPONENTS_DIR, 'hydrate'))}\n` +
+								`export default hydrate(${args.path})\n`,
+							loader: 'tsx',
+							resolveDir: COMPONENTS_DIR,
+						}))
+					},
+				},
+			],
 			target: 'browser',
 			format: 'esm',
 			splitting: true,
@@ -49,23 +66,6 @@ export class UiService {
 
 	public findModule(file: string): Blob | undefined {
 		return this._modules.get(file)
-	}
-
-	private async _writeEntries(): Promise<string[]> {
-		await mkdir(ENTRIES_DIR, { recursive: true })
-		return Promise.all(
-			Object.keys(COMPONENTS).map(async (name) => {
-				const file = path.join(ENTRIES_DIR, `${name}.tsx`)
-				const dir = path.join(COMPONENTS_DIR, this._toKebabCase(name))
-				await Bun.write(
-					file,
-					`import { ${name} } from ${JSON.stringify(dir)}\n` +
-						`import { hydrate } from ${JSON.stringify(path.join(COMPONENTS_DIR, 'hydrate'))}\n` +
-						`export default hydrate(${name})\n`
-				)
-				return file
-			})
-		)
 	}
 
 	private _toKebabCase(name: string): string {

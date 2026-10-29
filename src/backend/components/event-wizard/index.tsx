@@ -220,12 +220,12 @@ export const EventWizard: React.FC<EventWizardProps> = ({
 			)}
 
 			{status === 'added' ? (
-				<p className="text-sm text-white/60">✅ Agregado al calendario (simulado)</p>
+				<p className="text-sm text-neutral-500">✅ Agregado al calendario (simulado)</p>
 			) : (
 				<div className="flex gap-2">
 					<button
 						type="button"
-						className="rounded-full px-4 py-2.5 text-white/70 hover:text-white disabled:opacity-30 cursor-pointer"
+						className="rounded-full px-4 py-2.5 text-neutral-500 hover:text-neutral-900 disabled:opacity-30 cursor-pointer"
 						disabled={step === 0}
 						onClick={() => setStep(step - 1)}
 					>
@@ -234,7 +234,7 @@ export const EventWizard: React.FC<EventWizardProps> = ({
 					{isSummary && (
 						<button
 							type="button"
-							className="rounded-full border border-white/30 px-5 py-2.5 text-white hover:bg-white/10 cursor-pointer"
+							className="rounded-full border border-neutral-300 px-5 py-2.5 text-neutral-800 hover:bg-neutral-100 cursor-pointer"
 							onClick={discard}
 						>
 							Descartar

@@ -4,12 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --hot src/backend/main.ts",
-    "start": "NODE_ENV=production bun src/backend/main.ts",
-    "build": "bun run build.ts"
+    "dev": "bun --hot src/server.ts",
+    "start": "NODE_ENV=production bun src/server.ts",
+    "build": "bun run build.ts",
+    "apikey": "bun scripts/generate-api-key.ts"
   },
   "dependencies": {
     "@ai-sdk/azure": "^4.0.112",
+    "@ai-sdk/mcp": "2.0.19",
     "@ai-sdk/react": "^4.0.159",
     "ai": "^7.0.155",
     "bun-plugin-tailwind": "^0.0.15",
